@@ -17,9 +17,11 @@ Install dependencies (one-time):
 # ══════════════════════════════════════════════════════════════
 import warnings, json, io, os, re, base64
 warnings.filterwarnings("ignore")
+print(">>> [1] base imports OK", flush=True)
 
 import numpy as np
 import pandas as pd
+print(">>> [2] numpy/pandas OK", flush=True)
 from datetime import date
 from scipy import stats as scipy_stats
 
@@ -27,6 +29,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 
+print(">>> [3] plotly OK", flush=True)
 import dash
 from dash import dcc, html, dash_table, Input, Output, State, callback_context
 import dash_bootstrap_components as dbc
@@ -47,6 +50,7 @@ from sklearn.metrics import (
     confusion_matrix, classification_report,
 )
 
+print(">>> [4] dash/sklearn OK", flush=True)
 # NLP (Phase 5) — gracefully degrade if missing
 try:
     import nltk
@@ -62,6 +66,7 @@ except ImportError:
 # ══════════════════════════════════════════════════════════════
 #  GLOBAL COLOUR PALETTE  (shared across all phases)
 # ══════════════════════════════════════════════════════════════
+print(">>> [5] all imports OK", flush=True)
 NAV_BG   = "#0a0e1a"
 DARK_BG  = "#0d1117"
 CARD_BG  = "#161b22"
@@ -159,6 +164,7 @@ wc_b64_global         = ""
 # ══════════════════════════════════════════════════════════════
 #  DASH APP  INIT
 # ══════════════════════════════════════════════════════════════
+print(">>> [6] building app layout", flush=True)
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.DARKLY],
