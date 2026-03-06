@@ -78,6 +78,7 @@ torch = _DummyModule()
 #  GLOBAL COLOUR PALETTE  (shared across all phases)
 # ══════════════════════════════════════════════════════════════
 print(">>> [5] all imports OK", flush=True)
+print(">>> [5a] colours OK", flush=True)
 NAV_BG   = "#0a0e1a"
 DARK_BG  = "#0d1117"
 CARD_BG  = "#161b22"
@@ -100,12 +101,14 @@ def _safe_read(path, **kw):
         return pd.read_csv(path, **kw)
     return pd.DataFrame()
 
+print(">>> [5b] loading CSVs", flush=True)
 DF_MAIN   = _safe_read("df.csv",           parse_dates=["Date"])
 X_TRAIN   = _safe_read("x_train2_5.csv",   parse_dates=["Date"])
 Y_TRAIN   = _safe_read("y_train2_5.csv",   parse_dates=["Date"])
 X_TEST    = _safe_read("x_test2_5.csv",    parse_dates=["Date"])
 Y_TEST    = _safe_read("y_test2_5.csv",    parse_dates=["Date"])
 
+print(">>> [5c] CSVs loaded OK", flush=True)
 # Phase-1 – SOURCE_DF  (same as DF_MAIN)
 SOURCE_DF = DF_MAIN.copy() if not DF_MAIN.empty else pd.DataFrame()
 
@@ -118,6 +121,7 @@ if not DF_MAIN.empty:
 else:
     df_raw = pd.DataFrame(columns=["Date","Year","Quarter","Month"])
 
+print(">>> [5d] phase1/2 data OK", flush=True)
 INDICES = {
     "Nifty 50"  : {"close":"Close_^NSEI",  "open":"Open_^NSEI",  "ret":"returns_^NSEI"},
     "DAX"       : {"close":"Close_^GDAXI", "open":"Open_^GDAXI", "ret":"returns_^GDAX"},
@@ -144,7 +148,9 @@ def CLO(idx):
 YEARS = sorted(df_raw["Year"].unique()) if not df_raw.empty else []
 
 # Phase-3/4 – ML
+print(">>> [5e] indices OK", flush=True)
 FEATURE_COLS = [c for c in X_TRAIN.columns if c != "Date"] if not X_TRAIN.empty else []
+print(">>> [5f] feature cols OK", flush=True)
 ML_MODELS = {
     "Logistic Regression":          LogisticRegression(C=0.1, solver="liblinear", random_state=42, max_iter=1000),
     "Decision Tree":                DecisionTreeClassifier(random_state=42),
@@ -158,6 +164,7 @@ ML_MODELS = {
 MODEL_NAMES   = list(ML_MODELS.keys())
 CUTOFF_VALUES = [0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.95]
 
+print(">>> [5g] ML models OK", flush=True)
 # Phase-5 – NLP (BERT/FinBERT disabled - too heavy for 512MB free tier)
 if NLP_AVAILABLE:
     sid_vader = SentimentIntensityAnalyzer()
@@ -165,6 +172,7 @@ else:
     sid_vader = None
 _tok = _finbert = None  # FinBERT not loaded on free tier
 
+print(">>> [5h] NLP init OK", flush=True)
 positive_words = {"good","great","positive","gain","profits","rise","up","bull","bullish","strong","growth"}
 negative_words = {"bad","loss","losses","fall","down","bear","bearish","weak","decline","crash","debt"}
 
@@ -182,6 +190,7 @@ app = dash.Dash(
     title="Multi-Phase Analytics Dashboard",
 )
 server = app.server
+print(">>> [6a] app+server created OK", flush=True)
 
 # ── CSS injection ──────────────────────────────────────────────
 GLOBAL_CSS = """
