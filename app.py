@@ -52,16 +52,27 @@ from sklearn.metrics import (
 
 print(">>> [4] dash/sklearn OK", flush=True)
 # NLP (Phase 5) — gracefully degrade if missing
+# torch/transformers removed - too heavy for 512MB RAM (Render free tier)
+# Only load lightweight NLP: nltk vader + wordcloud
 try:
     import nltk
     from nltk.sentiment.vader import SentimentIntensityAnalyzer
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification
-    import torch
     from wordcloud import WordCloud
     nltk.download("vader_lexicon", quiet=True)
     NLP_AVAILABLE = True
+    BERT_AVAILABLE = False  # BERT disabled to save memory
 except ImportError:
     NLP_AVAILABLE = False
+    BERT_AVAILABLE = False
+
+# Stub out torch/transformers so any code referencing them doesn't crash
+class _DummyModule:
+    def __getattr__(self, name): return self
+    def __call__(self, *a, **kw): return self
+
+AutoTokenizer = _DummyModule()
+AutoModelForSequenceClassification = _DummyModule()
+torch = _DummyModule()
 
 # ══════════════════════════════════════════════════════════════
 #  GLOBAL COLOUR PALETTE  (shared across all phases)
@@ -147,13 +158,12 @@ ML_MODELS = {
 MODEL_NAMES   = list(ML_MODELS.keys())
 CUTOFF_VALUES = [0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.95]
 
-# Phase-5 – NLP
+# Phase-5 – NLP (BERT/FinBERT disabled - too heavy for 512MB free tier)
 if NLP_AVAILABLE:
-    sid_vader  = SentimentIntensityAnalyzer()
-    _tok       = AutoTokenizer.from_pretrained("ProsusAI/finbert")
-    _finbert   = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
+    sid_vader = SentimentIntensityAnalyzer()
 else:
-    sid_vader = _tok = _finbert = None
+    sid_vader = None
+_tok = _finbert = None  # FinBERT not loaded on free tier
 
 positive_words = {"good","great","positive","gain","profits","rise","up","bull","bullish","strong","growth"}
 negative_words = {"bad","loss","losses","fall","down","bear","bearish","weak","decline","crash","debt"}
@@ -1239,10 +1249,8 @@ def vader_sentiment_fn(text):
     return 'Positive' if c>=0.05 else('Negative' if c<=-0.05 else 'Neutral')
 
 def finbert_sentiment_fn(text):
-    if not NLP_AVAILABLE: return 'N/A'
-    inp=_tok(text,return_tensors='pt',truncation=True,padding=True)
-    out=_finbert(**inp); prob=torch.softmax(out.logits,dim=1)
-    return ['Negative','Neutral','Positive'][torch.argmax(prob).item()]
+    # FinBERT disabled on free tier (insufficient RAM)
+    return 'N/A (FinBERT disabled)'  
 
 def process_sentiment_df(df_in):
     df=df_in.copy()
