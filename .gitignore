@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+master_data.csv
+sentiment_results.csv
+.DS_Store

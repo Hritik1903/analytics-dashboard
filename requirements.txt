@@ -1,0 +1,12 @@
+dash==2.14.2
+pandas
+plotly
+dash-bootstrap-components
+scikit-learn
+scipy
+numpy
+nltk
+transformers
+torch
+wordcloud
+gunicorn
