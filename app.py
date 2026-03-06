@@ -1881,10 +1881,11 @@ def p5_download(n,df_json):
 # ══════════════════════════════════════════════════════════════
 #  ENTRY POINT
 # ══════════════════════════════════════════════════════════════
+PORT = int(os.environ.get("PORT", 8050))
+
 if __name__ == "__main__":
-    PORT = int(os.environ.get("PORT", 8050))
     print("\n" + "═"*60)
     print("  Multi-Phase Analytics Dashboard")
-    print("  Open: http://127.0.0.1:8050")
+    print(f"  Open: http://0.0.0.0:{PORT}")
     print("═"*60 + "\n")
     app.run_server(debug=False, host="0.0.0.0", port=PORT)
